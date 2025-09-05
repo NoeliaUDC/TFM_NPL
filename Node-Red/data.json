@@ -1,0 +1,588 @@
+[
+    {
+        "id": "804b768b86a92dab",
+        "type": "tab",
+        "label": "Data",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "47e2d9ba37ef5ced",
+        "type": "ui_date_picker",
+        "z": "804b768b86a92dab",
+        "name": "",
+        "label": "StartDate",
+        "group": "e55026d8d232e481",
+        "order": 9,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "topic": "StartDate",
+        "topicType": "msg",
+        "className": "",
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "1baaa4334f081ab3"
+            ]
+        ]
+    },
+    {
+        "id": "bf7dffea494fc565",
+        "type": "ui_date_picker",
+        "z": "804b768b86a92dab",
+        "name": "",
+        "label": "EndDate",
+        "group": "e55026d8d232e481",
+        "order": 10,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "topic": "EndDate",
+        "topicType": "msg",
+        "className": "",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "1cd649b3b4df789b"
+            ]
+        ]
+    },
+    {
+        "id": "32eded63e5f7828c",
+        "type": "ui_switch",
+        "z": "804b768b86a92dab",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "group": "e55026d8d232e481",
+        "order": 4,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "PLC2",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "PLC1",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 190,
+        "y": 100,
+        "wires": [
+            [
+                "ebf5b58b2e702012"
+            ]
+        ]
+    },
+    {
+        "id": "550ad103a45f893a",
+        "type": "function",
+        "z": "804b768b86a92dab",
+        "name": "CONFIG",
+        "func": "let start = msg.start \nlet end = msg.enddate \nlet simId = msg.plc\n\nmsg.query = `from(bucket: \"simulation_config\")\n  |> range(start: ${start}, stop: ${end})\n  |> filter(fn: (r) => r[\"simulacion_id\"] =~ /${simId}/)\n`\n\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 300,
+        "wires": [
+            [
+                "c4db01b684779e6f"
+            ]
+        ]
+    },
+    {
+        "id": "c4db01b684779e6f",
+        "type": "influxdb in",
+        "z": "804b768b86a92dab",
+        "influxdb": "a289498a2dc28964",
+        "name": "",
+        "query": "",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "EUP_TFM_NPL",
+        "x": 890,
+        "y": 300,
+        "wires": [
+            [
+                "e965af54bd5eb22f"
+            ]
+        ]
+    },
+    {
+        "id": "e7e37aa7e1e0ab0a",
+        "type": "ui_chart",
+        "z": "804b768b86a92dab",
+        "name": "",
+        "group": "e55026d8d232e481",
+        "order": 13,
+        "width": 17,
+        "height": 7,
+        "label": "Historico",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1220,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5e6f1dc019f2e3ab",
+        "type": "function",
+        "z": "804b768b86a92dab",
+        "name": "RESULT",
+        "func": "let start = msg.start \nlet end = msg.enddate \nlet simId = msg.plc\n\nmsg.query = `from(bucket: \"simulation_result\")\n  |> range(start: ${start}, stop: ${end})\n  |> filter(fn: (r) => r[\"simulacion_id\"] =~ /${simId}/)\n`\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 360,
+        "wires": [
+            [
+                "39d3034938de6a4e"
+            ]
+        ]
+    },
+    {
+        "id": "39d3034938de6a4e",
+        "type": "influxdb in",
+        "z": "804b768b86a92dab",
+        "influxdb": "a289498a2dc28964",
+        "name": "",
+        "query": "",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "EUP_TFM_NPL",
+        "x": 890,
+        "y": 360,
+        "wires": [
+            [
+                "d0bc6e306cddd730"
+            ]
+        ]
+    },
+    {
+        "id": "1fb3b6ac810accf8",
+        "type": "ui_button",
+        "z": "804b768b86a92dab",
+        "name": "",
+        "group": "e55026d8d232e481",
+        "order": 7,
+        "width": 4,
+        "height": 2,
+        "passthru": false,
+        "label": "Consultar",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "Consultar",
+        "topicType": "msg",
+        "x": 180,
+        "y": 220,
+        "wires": [
+            [
+                "e95293c0ca448391"
+            ]
+        ]
+    },
+    {
+        "id": "6937e80ea3f96f2d",
+        "type": "ui_text",
+        "z": "804b768b86a92dab",
+        "group": "e55026d8d232e481",
+        "order": 1,
+        "width": 17,
+        "height": 1,
+        "name": "",
+        "label": "",
+        "format": "Seleccione el PLC y el rango de días que desea consultar. La hora se establecerá automáticamente a 00:00. Si no se selecciona ningún fecha, se tomará el periodo completo del día anterior.",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 170,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "e9717eb3137a78db",
+        "type": "ui_text",
+        "z": "804b768b86a92dab",
+        "group": "e55026d8d232e481",
+        "order": 3,
+        "width": 3,
+        "height": 1,
+        "name": "",
+        "label": "PLC1",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 610,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "3b36aae6c415a5c5",
+        "type": "ui_text",
+        "z": "804b768b86a92dab",
+        "group": "e55026d8d232e481",
+        "order": 5,
+        "width": 3,
+        "height": 1,
+        "name": "",
+        "label": "PLC2",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 750,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "08c359394db1df79",
+        "type": "function",
+        "z": "804b768b86a92dab",
+        "name": "DATES",
+        "func": "// Leer las variables del flow (timestamps en ms)\nlet start = flow.get(\"start\");\nlet enddate = flow.get(\"enddate\");\n\n// Función auxiliar para RFC3339\nfunction toRFC3339(date) {\n    return date.toISOString().slice(0,19) + \"Z\"; // YYYY-MM-DDTHH:MM:SSZ\n}\n\n// Obtener hoy en ms\nlet hoy = Date.now();\n\n// Si start no existe, usamos ayer\nif (!start) {\n    start = hoy - 24*60*60*1000; // ayer en ms\n}\n\n// Si enddate no existe, usamos hoy\nif (!enddate) {\n    enddate = hoy;\n}\n\n// Crear objetos Date desde ms\nlet startDate = new Date(start);\nlet endDate   = new Date(enddate);\n\n// Guardamos en msg\nmsg.startMS  = start;                 // timestamp ms\nmsg.endMS    = enddate;               // timestamp ms\nmsg.start = toRFC3339(startDate);  // formato Flux ISO\nmsg.enddate   = toRFC3339(endDate);    // formato Flux ISO\n\n// Borrar variables de flow para que no persistan en la siguiente ejecución\nflow.set(\"start\", undefined);\nflow.set(\"enddate\", undefined);\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 340,
+        "wires": [
+            [
+                "550ad103a45f893a",
+                "5e6f1dc019f2e3ab"
+            ]
+        ]
+    },
+    {
+        "id": "e95293c0ca448391",
+        "type": "function",
+        "z": "804b768b86a92dab",
+        "name": "PLC?",
+        "func": "\nmsg.plc=flow.get(\"plc\") || \"PLC1\"\n// Retornar el mensaje\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 220,
+        "wires": [
+            [
+                "08c359394db1df79"
+            ]
+        ]
+    },
+    {
+        "id": "ebf5b58b2e702012",
+        "type": "function",
+        "z": "804b768b86a92dab",
+        "name": "PLC",
+        "func": "\n    flow.set(\"plc\", \"PLC1\"); // Valor por defecto\n\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1baaa4334f081ab3",
+        "type": "function",
+        "z": "804b768b86a92dab",
+        "name": "startdate",
+        "func": "flow.set(\"start\", msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1cd649b3b4df789b",
+        "type": "function",
+        "z": "804b768b86a92dab",
+        "name": "enddate",
+        "func": "flow.set(\"enddate\", msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "92d8bf42ad2522b0",
+        "type": "ui_table",
+        "z": "804b768b86a92dab",
+        "group": "e55026d8d232e481",
+        "name": "Tabla Parámetros",
+        "order": 12,
+        "width": 17,
+        "height": 2,
+        "columns": [
+            {
+                "field": "simulation_id",
+                "title": "ID",
+                "width": "500",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "Kp",
+                "title": "KP",
+                "width": "100",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "Kd",
+                "title": "TD",
+                "width": "100",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "Ti",
+                "title": "Ti",
+                "width": "100",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "SP",
+                "title": "SP",
+                "width": "100",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            }
+        ],
+        "outputs": 0,
+        "cts": false,
+        "x": 1250,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "e965af54bd5eb22f",
+        "type": "function",
+        "z": "804b768b86a92dab",
+        "name": "tabla",
+        "func": "let rowsMap = {}; // Usaremos un mapa temporal para agrupar por simulation_id\n\nmsg.payload.forEach(item => {\n    let id = item.simulacion_id || item.simulation_id;\n\n    // Si aún no existe el objeto para este simulation_id, lo creamos\n    if (!rowsMap[id]) {\n        rowsMap[id] = { simulation_id: id, Kp: null, Ti: null, Kd: null, SP: null };\n    }\n\n    // Asignamos el valor según _field\n    if (item._field && item._value !== undefined) {\n        rowsMap[id][item._field] = item._value;\n    }\n});\n\n// Convertimos el mapa a un array\nlet rows = Object.values(rowsMap);\n\n// Asignamos el array a msg.payload para la tabla del dashboard\nmsg.payload = rows;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 300,
+        "wires": [
+            [
+                "92d8bf42ad2522b0"
+            ]
+        ]
+    },
+    {
+        "id": "d0bc6e306cddd730",
+        "type": "function",
+        "z": "804b768b86a92dab",
+        "name": "gráfica",
+        "func": "let seriesMap = {}; // mapa para agrupar por simulacion_id\n\nmsg.payload.forEach(row => {\n    let simId = row.simulacion_id;\n\n    if (!seriesMap[simId]) {\n        seriesMap[simId] = [];\n    }\n\n    seriesMap[simId].push({\n        x: new Date(row._time).getTime(),\n        y: row._value\n    });\n});\n\n// Convertimos seriesMap a formato que la gráfica espera\nlet seriesNames = Object.keys(seriesMap); // cada simulacion_id será una serie\nlet data = seriesNames.map(name => seriesMap[name]);\nlet labels = {}; // opcional, si quieres etiquetas por serie\nseriesNames.forEach(name => {\n    labels[name] = seriesMap[name].map(p => new Date(p.x).toLocaleTimeString());\n});\n\nmsg.payload = [{\n    series: seriesNames, // nombres de las series\n    data: data,          // datos x,y por serie\n    labels: labels       // etiquetas por serie\n}];\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 360,
+        "wires": [
+            [
+                "e7e37aa7e1e0ab0a"
+            ]
+        ]
+    },
+    {
+        "id": "be0ab79ed673644f",
+        "type": "ui_spacer",
+        "z": "804b768b86a92dab",
+        "name": "spacer",
+        "group": "e55026d8d232e481",
+        "order": 2,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "cd9c5ac57ce8f420",
+        "type": "ui_spacer",
+        "z": "804b768b86a92dab",
+        "name": "spacer",
+        "group": "e55026d8d232e481",
+        "order": 6,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "7d245dd4604d9a7a",
+        "type": "ui_spacer",
+        "z": "804b768b86a92dab",
+        "name": "spacer",
+        "group": "e55026d8d232e481",
+        "order": 8,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "7f3aaa88ea03b3b5",
+        "type": "ui_spacer",
+        "z": "804b768b86a92dab",
+        "name": "spacer",
+        "group": "e55026d8d232e481",
+        "order": 11,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "e55026d8d232e481",
+        "type": "ui_group",
+        "name": "HISTORICO",
+        "tab": "6726ba930dd25265",
+        "order": 1,
+        "disp": true,
+        "width": 17,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a289498a2dc28964",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "database",
+        "name": "DataBase_InfluxDB",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://10.11.164.102:8086",
+        "timeout": 10,
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "6726ba930dd25265",
+        "type": "ui_tab",
+        "name": "DATA",
+        "icon": "dashboard",
+        "order": 4,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "d6c31a042f07207c",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.5",
+            "node-red-contrib-influxdb": "0.7.0",
+            "node-red-node-ui-table": "0.4.5"
+        }
+    }
+]

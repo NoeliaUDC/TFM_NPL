@@ -1,0 +1,1070 @@
+[
+    {
+        "id": "e5e013c639e6ba4f",
+        "type": "tab",
+        "label": "PLC 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "ddc3dabf973aa249",
+        "type": "inject",
+        "z": "e5e013c639e6ba4f",
+        "name": ".",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "iso",
+        "payloadType": "date",
+        "x": 90,
+        "y": 120,
+        "wires": [
+            [
+                "efc72fd069a99f65",
+                "64a43bf17e51828d",
+                "209d19187a287161",
+                "a3bc88c7b604afa9",
+                "5e2cc29afb6de043",
+                "0bb3d7e250a8ad0c",
+                "69eb6da8deac4f57"
+            ]
+        ]
+    },
+    {
+        "id": "3ede00fc5d2eb0f1",
+        "type": "OpcUa-Client",
+        "z": "e5e013c639e6ba4f",
+        "endpoint": "7492368f2d14a6f1",
+        "action": "subscribe",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "l",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "useTransport": false,
+        "maxChunkCount": "1",
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "",
+        "x": 620,
+        "y": 120,
+        "wires": [
+            [
+                "e84a92515db942f4"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "e84a92515db942f4",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Guardar Global",
+        "func": "// Extraer la última parte del topic como nombre de variable\nif (msg.topic!=\"subscriptionId\") {\n    // Coincide: empieza con !ns=6;\n    let topic = msg.topic;\n    let partes = topic.split('/');\n    let nombreVariable = \"PLC1_\" + partes[partes.length - 1];\n\n    // Guardar en el contexto global\n    global.set(nombreVariable, msg.payload);\n\n    // (Opcional) Mostrar en el debug que se actualizó\n    node.status({ fill: \"green\", shape: \"dot\", text: `Global set: ${nombreVariable}` });\n\n    return msg;\n\n}\n\n\n\n// const varName = msg.topic.split(\"/\").pop();\n// let value = msg.payload;\n\n// // Si se puede convertir a número, lo guardamos como número\n// // let numericValue = parseFloat(value);\n// // if (!isNaN(numericValue)) {\n// //     value = numericValue;\n// // }\n\n// global.set(varName, value);\n// return null;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "068ab2246f472460",
+        "type": "comment",
+        "z": "e5e013c639e6ba4f",
+        "name": "LECTURA VARIABLES",
+        "info": "",
+        "x": 120,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "efc72fd069a99f65",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Leer si libre KP",
+        "func": "if (global.get(\"opc_busy\")) return null;\nmsg.topic = \"ns=6;s=Arp.Plc.Eclr/KP\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 120,
+        "wires": [
+            [
+                "3ede00fc5d2eb0f1"
+            ]
+        ]
+    },
+    {
+        "id": "64a43bf17e51828d",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Leer si libre TD",
+        "func": "if (global.get(\"opc_busy\")) return null;\nmsg.topic = \"ns=6;s=Arp.Plc.Eclr/TD\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 160,
+        "wires": [
+            [
+                "3ede00fc5d2eb0f1"
+            ]
+        ]
+    },
+    {
+        "id": "209d19187a287161",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Leer si libre TI",
+        "func": "if (global.get(\"opc_busy\")) return null;\nmsg.topic = \"ns=6;s=Arp.Plc.Eclr/TI\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 200,
+        "wires": [
+            [
+                "3ede00fc5d2eb0f1"
+            ]
+        ]
+    },
+    {
+        "id": "a3bc88c7b604afa9",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Leer si libre Nivel",
+        "func": "if (global.get(\"opc_busy\")) return null;\nmsg.topic = \"ns=6;s=Arp.Plc.Eclr/Sensor_Ultrasonido_Porcentaje\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 240,
+        "wires": [
+            [
+                "3ede00fc5d2eb0f1"
+            ]
+        ]
+    },
+    {
+        "id": "5e2cc29afb6de043",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Leer si libre SP",
+        "func": "if (global.get(\"opc_busy\")) return null;\nmsg.topic = \"ns=6;s=Arp.Plc.Eclr/SP_NivelTanque\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 280,
+        "wires": [
+            [
+                "3ede00fc5d2eb0f1"
+            ]
+        ]
+    },
+    {
+        "id": "0bb3d7e250a8ad0c",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Leer si libre START",
+        "func": "if (global.get(\"opc_busy\")) return null;\nmsg.topic = \"ns=6;s=Arp.Plc.Eclr/Start_Stop\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 320,
+        "wires": [
+            [
+                "3ede00fc5d2eb0f1"
+            ]
+        ]
+    },
+    {
+        "id": "69eb6da8deac4f57",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Leer si libre Stop",
+        "func": "if (global.get(\"opc_busy\")) return null;\nmsg.topic = \"ns=6;s=Arp.Plc.Eclr/Stop\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 360,
+        "wires": [
+            [
+                "3ede00fc5d2eb0f1"
+            ]
+        ]
+    },
+    {
+        "id": "36f0cd03eb6aac15",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Preparacion escritura Start",
+        "func": "let valor = msg.payload;\nlet queue = global.get(\"write_queue\") || [];\nqueue.push({\n    topic: \"ns=6;s=Arp.Plc.Eclr/Start_Stop\",\n    value: valor,\n    datatype: \"Boolean\"\n});\nglobal.set(\"write_queue\", queue);\n// if (!global.get(\"opc_busy\")) return { payload: null };\n// return null;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 600,
+        "wires": [
+            [
+                "587df42586d05119"
+            ]
+        ]
+    },
+    {
+        "id": "10a3438e4dc3f62a",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Preparacion Escritura KP",
+        "func": "let value = Number(msg.payload).toFixed(2);\nlet queue = global.get('write_queue') || [];\nif (value != null) {\n    // let queue = global.get('write_queue') || [];\n    queue.push({\n        topic: 'ns=6;s=Arp.Plc.Eclr/KP',\n        value: value,//.toString(),  \n        datatype: 'Float'\n    });\n    global.set('write_queue', queue);\n    // if (!global.get('opc_busy')) return { payload: null };\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 440,
+        "wires": [
+            [
+                "587df42586d05119"
+            ]
+        ]
+    },
+    {
+        "id": "eb13a44c4dda2d98",
+        "type": "comment",
+        "z": "e5e013c639e6ba4f",
+        "name": "ESCRITURA PREIODICA VARIABLES",
+        "info": "",
+        "x": 1130,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "a531a987db5e6b58",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Preparacion Escritura TD",
+        "func": "let value = Number(msg.payload).toFixed(2);\nlet queue = global.get('write_queue') || [];\n if (value !=null) {\n    // let queue = global.get('write_queue') || [];\n    queue.push({\n        topic: 'ns=6;s=Arp.Plc.Eclr/TD',\n        value: value,//.toString(),  \n        datatype: 'Float'\n    });\n    global.set('write_queue', queue);\n    // global.set('write_queue', queue);\n    // if (!global.get('opc_busy')) return { payload: null };\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 480,
+        "wires": [
+            [
+                "587df42586d05119"
+            ]
+        ]
+    },
+    {
+        "id": "319d5c0915aa08c2",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Preparacion Escritura TI",
+        "func": "let value = Number(msg.payload).toFixed(2);\nlet queue = global.get('write_queue') || [];\nif (value != null) {\n// let queue = global.get('write_queue') || [];\n    queue.push({\n        topic: 'ns=6;s=Arp.Plc.Eclr/TI',\n        value: value,//.toString(),  \n        datatype: 'Float'\n    });\n    global.set('write_queue', queue);\n// global.set('write_queue', queue);\n// if (!global.get('opc_busy')) return { payload: null };\nreturn msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 520,
+        "wires": [
+            [
+                "587df42586d05119"
+            ]
+        ]
+    },
+    {
+        "id": "f00340a70d86659f",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Preparacion Escritura SP",
+        "func": "let value = Number(msg.payload).toFixed(2);\nlet queue = global.get('write_queue') || [];\n if (value !=null) {\n    // let queue = global.get('write_queue') || [];\n    queue.push({\n        topic: 'ns=6;s=Arp.Plc.Eclr/SP_NivelTanque',\n        value: value,//.toString(),  \n        datatype: 'Float'\n    });\n    global.set('write_queue', queue);\n// global.set('write_queue', queue);\n// if (!global.get('opc_busy')) return { payload: null };\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 560,
+        "wires": [
+            [
+                "587df42586d05119"
+            ]
+        ]
+    },
+    {
+        "id": "587df42586d05119",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Procesar cola escritura",
+        "func": "let queue = global.get('write_queue') || [];\nif (queue.length === 0) {\n  global.set('opc_busy', false);\n  return null;\n}\nlet item = queue.shift();\nglobal.set('write_queue', queue);\nglobal.set('opc_busy', true);\nmsg = {\n  topic: item.topic,\n  payload: item.value,\n  datatype: item.datatype\n  \n};\nreturn [msg];",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 560,
+        "wires": [
+            [
+                "b71235e6a7f460d8"
+            ]
+        ]
+    },
+    {
+        "id": "704425f2bee68253",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Post escritura",
+        "func": "let varName = msg.topic.split(\"/\").pop();\nglobal.set(varName, msg.payload.value);\nglobal.set('opc_busy', false);\nlet queue = global.get(\"write_queue\") || [];\nif (queue.length = 0) {\n    // La cola está vacía\n    node.status({ fill: \"grey\", shape: \"ring\", text: \"Cola vacía\" });\n    return null;  // No enviamos nada\n} else {\n    // Hay elementos en la cola\n   // let item = queue.shift();\n    node.status({ fill: \"blue\", shape: \"dot\", text: `Cola: ${queue.length}` });\n    //global.set(\"write_queue\", queue);\n    return { payload: \"next\" };\n}\n\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1380,
+        "y": 560,
+        "wires": [
+            [
+                "587df42586d05119"
+            ]
+        ]
+    },
+    {
+        "id": "b71235e6a7f460d8",
+        "type": "OpcUa-Client",
+        "z": "e5e013c639e6ba4f",
+        "endpoint": "7492368f2d14a6f1",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "l",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "useTransport": false,
+        "maxChunkCount": "1",
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "",
+        "x": 1140,
+        "y": 560,
+        "wires": [
+            [
+                "704425f2bee68253"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c56606a6ea4baeb5",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "Preparacion escritura Stop",
+        "func": "let valor = msg.payload;\nlet queue = global.get(\"write_queue\") || [];\nqueue.push({\n    topic: \"ns=6;s=Arp.Plc.Eclr/Start_Stop\",\n    value: valor,\n    datatype: \"Boolean\"\n});\nglobal.set(\"write_queue\", queue);\nif (!global.get(\"opc_busy\")) return { payload: null };\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 660,
+        "wires": [
+            [
+                "587df42586d05119"
+            ]
+        ]
+    },
+    {
+        "id": "59e9f97783d18b07",
+        "type": "ui_button",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "group": "453be903dc9c1067",
+        "order": 2,
+        "width": 8,
+        "height": 1,
+        "passthru": false,
+        "label": "PLC1_STOP",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "RED",
+        "className": "",
+        "icon": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 90,
+        "y": 660,
+        "wires": [
+            [
+                "c56606a6ea4baeb5",
+                "7dde09af7d072961"
+            ]
+        ]
+    },
+    {
+        "id": "0576403dbc1ea9ad",
+        "type": "ui_button",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "group": "453be903dc9c1067",
+        "order": 1,
+        "width": 8,
+        "height": 1,
+        "passthru": false,
+        "label": "PLC1_START",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "GREEN",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 100,
+        "y": 600,
+        "wires": [
+            [
+                "36f0cd03eb6aac15",
+                "1310b82baf8c103e"
+            ]
+        ]
+    },
+    {
+        "id": "203a477a18a2f2e7",
+        "type": "ui_text_input",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "label": "PLC1_SP",
+        "tooltip": "",
+        "group": "453be903dc9c1067",
+        "order": 10,
+        "width": 4,
+        "height": 1,
+        "passthru": true,
+        "mode": "number",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 80,
+        "y": 560,
+        "wires": [
+            [
+                "f00340a70d86659f"
+            ]
+        ]
+    },
+    {
+        "id": "33cb5a0e9a3d3fdb",
+        "type": "ui_text_input",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "label": "PLC1_TI",
+        "tooltip": "",
+        "group": "453be903dc9c1067",
+        "order": 9,
+        "width": 4,
+        "height": 1,
+        "passthru": true,
+        "mode": "number",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 80,
+        "y": 520,
+        "wires": [
+            [
+                "319d5c0915aa08c2"
+            ]
+        ]
+    },
+    {
+        "id": "56f8a7b304c30e39",
+        "type": "ui_text_input",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "label": "PLC1_TD",
+        "tooltip": "",
+        "group": "453be903dc9c1067",
+        "order": 8,
+        "width": 4,
+        "height": 1,
+        "passthru": true,
+        "mode": "number",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 80,
+        "y": 480,
+        "wires": [
+            [
+                "a531a987db5e6b58"
+            ]
+        ]
+    },
+    {
+        "id": "5d011532099daa4d",
+        "type": "ui_text_input",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "label": "PLC1_KP",
+        "tooltip": "",
+        "group": "453be903dc9c1067",
+        "order": 7,
+        "width": 4,
+        "height": 1,
+        "passthru": true,
+        "mode": "number",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 80,
+        "y": 440,
+        "wires": [
+            [
+                "10a3438e4dc3f62a"
+            ]
+        ]
+    },
+    {
+        "id": "df69ec0b836ec7bd",
+        "type": "comment",
+        "z": "e5e013c639e6ba4f",
+        "name": "PLC 1",
+        "info": "",
+        "x": 110,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "e1022fb5824e395a",
+        "type": "ui_chart",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "group": "453be903dc9c1067",
+        "order": 11,
+        "width": 16,
+        "height": 9,
+        "label": "SP/Nivel Grafica",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "3",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 600,
+        "y": 900,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "892ee034b7618b5a",
+        "type": "inject",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SP",
+        "payload": "PLC1_SP_NivelTanque",
+        "payloadType": "global",
+        "x": 190,
+        "y": 900,
+        "wires": [
+            [
+                "e1022fb5824e395a"
+            ]
+        ]
+    },
+    {
+        "id": "9e35064fd1e01962",
+        "type": "inject",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "Nivel",
+        "payload": "PLC1_Sensor_Ultrasonido_Porcentaje",
+        "payloadType": "global",
+        "x": 240,
+        "y": 940,
+        "wires": [
+            [
+                "e1022fb5824e395a"
+            ]
+        ]
+    },
+    {
+        "id": "a0b5c906fb62d18a",
+        "type": "inject",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SP",
+        "payload": "PLC1_TD",
+        "payloadType": "global",
+        "x": 150,
+        "y": 780,
+        "wires": [
+            [
+                "5c315c8b7dac1701"
+            ]
+        ]
+    },
+    {
+        "id": "45ccb87c6077edf0",
+        "type": "ui_text",
+        "z": "e5e013c639e6ba4f",
+        "group": "453be903dc9c1067",
+        "order": 4,
+        "width": 4,
+        "height": 1,
+        "name": "",
+        "label": "TD:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 630,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "524e08a7861aa705",
+        "type": "inject",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SP",
+        "payload": "PLC1_TI",
+        "payloadType": "global",
+        "x": 150,
+        "y": 820,
+        "wires": [
+            [
+                "fef14a3c516d644a"
+            ]
+        ]
+    },
+    {
+        "id": "88aa36dc41d6dc31",
+        "type": "ui_text",
+        "z": "e5e013c639e6ba4f",
+        "group": "453be903dc9c1067",
+        "order": 5,
+        "width": 4,
+        "height": 1,
+        "name": "",
+        "label": "TI:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 630,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "0e3e704420d4b6dc",
+        "type": "inject",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SP",
+        "payload": "PLC1_SP_NivelTanque",
+        "payloadType": "global",
+        "x": 190,
+        "y": 860,
+        "wires": [
+            [
+                "f236aedf0ce89ee4"
+            ]
+        ]
+    },
+    {
+        "id": "be8b1352d8ffa951",
+        "type": "ui_text",
+        "z": "e5e013c639e6ba4f",
+        "group": "453be903dc9c1067",
+        "order": 6,
+        "width": 4,
+        "height": 1,
+        "name": "",
+        "label": "SP: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 630,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "64744c30ecae2381",
+        "type": "inject",
+        "z": "e5e013c639e6ba4f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SP",
+        "payload": "PLC1_KP",
+        "payloadType": "global",
+        "x": 150,
+        "y": 740,
+        "wires": [
+            [
+                "362a4e299ca31475"
+            ]
+        ]
+    },
+    {
+        "id": "fa91944f32724aeb",
+        "type": "ui_text",
+        "z": "e5e013c639e6ba4f",
+        "group": "453be903dc9c1067",
+        "order": 3,
+        "width": 4,
+        "height": 1,
+        "name": "",
+        "label": "KP:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 630,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "362a4e299ca31475",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "2Decimal",
+        "func": "let value = Number(msg.payload).toFixed(2);\nmsg.payload=value;\nreturn msg\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 740,
+        "wires": [
+            [
+                "fa91944f32724aeb"
+            ]
+        ]
+    },
+    {
+        "id": "5c315c8b7dac1701",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "2Decimal",
+        "func": "let value = Number(msg.payload).toFixed(2);\nmsg.payload=value;\nreturn msg\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 780,
+        "wires": [
+            [
+                "45ccb87c6077edf0"
+            ]
+        ]
+    },
+    {
+        "id": "fef14a3c516d644a",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "2Decimal",
+        "func": "let value = Number(msg.payload).toFixed(2);\nmsg.payload=value;\nreturn msg\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 820,
+        "wires": [
+            [
+                "88aa36dc41d6dc31"
+            ]
+        ]
+    },
+    {
+        "id": "f236aedf0ce89ee4",
+        "type": "function",
+        "z": "e5e013c639e6ba4f",
+        "name": "2Decimal",
+        "func": "let value = Number(msg.payload).toFixed(2);\nmsg.payload=value;\nreturn msg\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 860,
+        "wires": [
+            [
+                "be8b1352d8ffa951"
+            ]
+        ]
+    },
+    {
+        "id": "1310b82baf8c103e",
+        "type": "link out",
+        "z": "e5e013c639e6ba4f",
+        "name": "PLC1_START",
+        "mode": "link",
+        "links": [
+            "102a62e1874cc5b3"
+        ],
+        "x": 195,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "7dde09af7d072961",
+        "type": "link out",
+        "z": "e5e013c639e6ba4f",
+        "name": "PLC1_STOP",
+        "mode": "link",
+        "links": [
+            "c6b7d57047c61aa2"
+        ],
+        "x": 195,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "7492368f2d14a6f1",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://10.11.164.218:4840",
+        "secpol": "Basic256",
+        "secmode": "SignAndEncrypt",
+        "none": false,
+        "login": true,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "453be903dc9c1067",
+        "type": "ui_group",
+        "name": "PLC 1",
+        "tab": "3f6e709d1cb890b4",
+        "order": 1,
+        "disp": true,
+        "width": 16,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "3f6e709d1cb890b4",
+        "type": "ui_tab",
+        "name": "PLC1",
+        "icon": "dashboard",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "879be9b81d3ce236",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-opcua": "0.2.340",
+            "node-red-dashboard": "3.6.5"
+        }
+    }
+]

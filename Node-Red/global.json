@@ -1,0 +1,686 @@
+[
+    {
+        "id": "2c610c4e96acf94f",
+        "type": "tab",
+        "label": "Global",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "fa6b799250f85065",
+        "type": "ui_text",
+        "z": "2c610c4e96acf94f",
+        "group": "513bc2426d63b254",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "titulo",
+        "label": "REGULACIÓN NIVEL TANQUE",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": true,
+        "font": "Arial Black,Arial Black,Gadget,sans-serif",
+        "fontSize": "30",
+        "color": "#000000",
+        "x": 70,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "5ea234bfb74f6fc2",
+        "type": "comment",
+        "z": "2c610c4e96acf94f",
+        "name": "DASHBOARD",
+        "info": "",
+        "x": 90,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "888b0d0b6d731b7c",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Simulation_ID PLC 1",
+        "func": "let now = new Date();\n\n//FORMATEAR\nlet year= now.getFullYear();\nlet month = String(now.getMonth() + 1).padStart(2,'0');\nlet day = String(now.getDay() ).padStart(2, '0')\nlet hour = String(now.getHours() ).padStart(2, '0');\nlet minute = String(now.getMinutes() + 1).padStart(2, '0');\nlet second = String(now.getSeconds() + 1).padStart(2, '0'); \n\nlet timestamp = year+month+day+\"_\"+hour+minute+second;\n\nlet id = \"SIM-PLC1-\" + timestamp ;\nflow.set(\"Simulation_ID_PLC1\",id);\nmsg.simulationid=id;\nflow.set(\"Registro_PLC1\",true);\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 340,
+        "wires": [
+            [
+                "d6c9beb8fa82407e"
+            ]
+        ]
+    },
+    {
+        "id": "d6c9beb8fa82407e",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Simulation_Config",
+        "func": "let fechaActual=Date.now();\nlet timestampNs=fechaActual*1e6;\n\nmsg.payload = [\n    {\n        measurement: \"simulacion_config\",\n        tags: {\n            simulacion_id: flow.get(\"Simulation_ID_PLC1\")\n        },\n        fields: {\n            Kp: global.get(\"PLC1_KP\"),\n            Ti: global.get(\"PLC1_TD\"), \n            Kd: global.get(\"PLC1_TI\"),\n            SP: global.get(\"PLC1_SP_NivelTanque\")\n        },\n        //timestamp: timestampNs\n    }\n];\n// return msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 380,
+        "wires": [
+            [
+                "e191a69823913861"
+            ]
+        ]
+    },
+    {
+        "id": "916b35430de70666",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Simulation_Result",
+        "func": "let fechaActual=Date.now();\nlet timestampNs=fechaActual*1e6;\n\nmsg.payload = [\n    {\n        measurement: \"simulacion_result\",\n        tags: {\n            simulacion_id: flow.get(\"Simulation_ID_PLC2\")\n        },\n        fields: {\n            Nivel: global.get(\"PLC2_Sensor_Ultrasonido_Porcentaje\")\n        \n        },\n        //timestamp: timestampNs\n    }\n];\n// return msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 620,
+        "wires": [
+            [
+                "10f59aa4cc344ff2",
+                "58f64573bb602633"
+            ]
+        ]
+    },
+    {
+        "id": "415e65b22fad15ec",
+        "type": "inject",
+        "z": "2c610c4e96acf94f",
+        "name": "5s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 620,
+        "wires": [
+            [
+                "6707214f37f17113"
+            ]
+        ]
+    },
+    {
+        "id": "6707214f37f17113",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Registro",
+        "func": "let status_register = flow.get(\"Registro_PLC2\");\n\nif (status_register) {\n    node.status({ fill: \"blue\", shape: \"dot\", text: `Register` });\n    return msg;\n}\nelse{\n    node.status({ fill: \"green\", shape: \"dot\", text: `OK` });\n}\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 620,
+        "wires": [
+            [
+                "916b35430de70666"
+            ]
+        ]
+    },
+    {
+        "id": "3a5efd9bbcc155ed",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Stop_Registro PLC 1",
+        "func": "flow.set(\"Registro_PLC1\",false);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e191a69823913861",
+        "type": "influxdb batch",
+        "z": "2c610c4e96acf94f",
+        "influxdb": "a289498a2dc28964",
+        "precision": "",
+        "retentionPolicy": "",
+        "name": "Write_InfluxDB_Config",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "EUP_TFM_NPL",
+        "bucket": "simulation_config",
+        "x": 880,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "10e93a09d34fa4fc",
+        "type": "influxdb batch",
+        "z": "2c610c4e96acf94f",
+        "influxdb": "a289498a2dc28964",
+        "precision": "",
+        "retentionPolicy": "",
+        "name": "Write_InfluxDB_Config",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "EUP_TFM_NPL",
+        "bucket": "simulation_result",
+        "x": 1000,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "bfc37883e0659557",
+        "type": "comment",
+        "z": "2c610c4e96acf94f",
+        "name": "REGISTRO DATOS INFLUXDB",
+        "info": "",
+        "x": 150,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "57ab067f4073cd1a",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Simulation_Result",
+        "func": "let fechaActual=Date.now();\nlet timestampNs=fechaActual*1e6;\n\nmsg.payload = [\n    {\n        measurement: \"simulacion_result\",\n        tags: {\n            simulacion_id: flow.get(\"Simulation_ID_PLC1\")\n        },\n        fields: {\n            Nivel: global.get(\"PLC1_Sensor_Ultrasonido_Porcentaje\")\n        \n        },\n        //timestamp: timestampNs\n    }\n];\n// return msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 580,
+        "wires": [
+            [
+                "44801f760ea6af5b",
+                "58f64573bb602633"
+            ]
+        ]
+    },
+    {
+        "id": "5f70e410c1673408",
+        "type": "inject",
+        "z": "2c610c4e96acf94f",
+        "name": "5s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 580,
+        "wires": [
+            [
+                "f634be2e4aff7508"
+            ]
+        ]
+    },
+    {
+        "id": "f634be2e4aff7508",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Registro",
+        "func": "let status_register = flow.get(\"Registro_PLC1\");\n\nif (status_register) {\n    node.status({ fill: \"blue\", shape: \"dot\", text: `Register` });\n    return msg;\n}\nelse{\n    node.status({ fill: \"green\", shape: \"dot\", text: `OK` });\n}\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 580,
+        "wires": [
+            [
+                "57ab067f4073cd1a"
+            ]
+        ]
+    },
+    {
+        "id": "7d1aab9680d03897",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Simulation_ID PLC 2",
+        "func": "let now = new Date();\n\n//FORMATEAR\nlet year= now.getFullYear();\nlet month = String(now.getMonth() + 1).padStart(2,'0');\nlet day = String(now.getDay() ).padStart(2, '0')\nlet hour = String(now.getHours()).padStart(2, '0');\nlet minute = String(now.getMinutes()).padStart(2, '0');\nlet second = String(now.getSeconds() ).padStart(2, '0'); \n\nlet timestamp = year+month+day+\"_\"+hour+minute+second;\n\nlet id = \"SIM-PLC2-\" + timestamp ;\nflow.set(\"Simulation_ID_PLC2\",id);\nmsg.simulationid=id;\nflow.set(\"Registro_PLC2\",true);\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 420,
+        "wires": [
+            [
+                "fdf5fa10072c5a3b"
+            ]
+        ]
+    },
+    {
+        "id": "9cfc836f088009fb",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Stop_Registro PLC 2",
+        "func": "flow.set(\"Registro_PLC2\",false);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fdf5fa10072c5a3b",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "Simulation_Config",
+        "func": "let fechaActual=Date.now();\nlet timestampNs=fechaActual*1e6;\n\nmsg.payload = [\n    {\n        measurement: \"simulacion_config\",\n        tags: {\n            simulacion_id: flow.get(\"Simulation_ID_PLC2\")\n        },\n        fields: {\n            Kp: global.get(\"PLC2_KP\"),\n            Ti: global.get(\"PLC2_TD\"), \n            Kd: global.get(\"PLC2_TI\"),\n            SP: global.get(\"PLC2_SP_NivelTanque\")\n        },\n        //timestamp: timestampNs\n    }\n];\n// return msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 420,
+        "wires": [
+            [
+                "e191a69823913861"
+            ]
+        ]
+    },
+    {
+        "id": "102a62e1874cc5b3",
+        "type": "link in",
+        "z": "2c610c4e96acf94f",
+        "name": "link in 1",
+        "links": [
+            "1310b82baf8c103e"
+        ],
+        "x": 145,
+        "y": 340,
+        "wires": [
+            [
+                "888b0d0b6d731b7c"
+            ]
+        ]
+    },
+    {
+        "id": "242f090c9785014e",
+        "type": "link in",
+        "z": "2c610c4e96acf94f",
+        "name": "link in 2",
+        "links": [
+            "4d782d06716b9718"
+        ],
+        "x": 145,
+        "y": 420,
+        "wires": [
+            [
+                "7d1aab9680d03897"
+            ]
+        ]
+    },
+    {
+        "id": "c6b7d57047c61aa2",
+        "type": "link in",
+        "z": "2c610c4e96acf94f",
+        "name": "link in 3",
+        "links": [
+            "7dde09af7d072961"
+        ],
+        "x": 145,
+        "y": 380,
+        "wires": [
+            [
+                "3a5efd9bbcc155ed"
+            ]
+        ]
+    },
+    {
+        "id": "c95e82dd92460153",
+        "type": "link in",
+        "z": "2c610c4e96acf94f",
+        "name": "link in 4",
+        "links": [
+            "8f38488eec7eaeee"
+        ],
+        "x": 145,
+        "y": 460,
+        "wires": [
+            [
+                "9cfc836f088009fb"
+            ]
+        ]
+    },
+    {
+        "id": "f161e731af1a6003",
+        "type": "ui_text",
+        "z": "2c610c4e96acf94f",
+        "group": "513bc2426d63b254",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Bienvenido",
+        "label": "Bienvenido. Se va a proceder a realizar el control de nivel de las plantas del laboratorio. A continuación se indica el estado de cada una de ellas: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": true,
+        "font": "Arial,Arial,Helvetica,sans-serif",
+        "fontSize": "16",
+        "color": "#242323",
+        "x": 90,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "d3d4412091b6a97b",
+        "type": "inject",
+        "z": "2c610c4e96acf94f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SP",
+        "payload": "PLC1_Start_Stop",
+        "payloadType": "global",
+        "x": 150,
+        "y": 180,
+        "wires": [
+            [
+                "09317ea4d3b38ed7"
+            ]
+        ]
+    },
+    {
+        "id": "07b1cf507ce65f2c",
+        "type": "inject",
+        "z": "2c610c4e96acf94f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "PLC2_Start_Stop",
+        "payloadType": "global",
+        "x": 150,
+        "y": 220,
+        "wires": [
+            [
+                "92cf5ac553b9e04e"
+            ]
+        ]
+    },
+    {
+        "id": "7e0a335711cf26db",
+        "type": "ui_text",
+        "z": "2c610c4e96acf94f",
+        "group": "513bc2426d63b254",
+        "order": 3,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "PLANTA 1",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": true,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 590,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "3ab8fe1f78201428",
+        "type": "ui_text",
+        "z": "2c610c4e96acf94f",
+        "group": "513bc2426d63b254",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "PLANTA 2",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": true,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 590,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "09317ea4d3b38ed7",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "color_text",
+        "func": "// Nodo Function para controlar indicador de planta\n// Recibe msg.payload = start_stop (true/false)\n\nif (msg.payload === true) {\n    msg.payload = \"ON\";       // Texto a mostrar\n    msg.color = \"green\";      // Color para ui_text o ui_template\n} else {\n    msg.payload = \"OFF\";\n    msg.color = \"red\";\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 180,
+        "wires": [
+            [
+                "7e0a335711cf26db"
+            ]
+        ]
+    },
+    {
+        "id": "92cf5ac553b9e04e",
+        "type": "function",
+        "z": "2c610c4e96acf94f",
+        "name": "color_text",
+        "func": "// Nodo Function para controlar indicador de planta\n// Recibe msg.payload = start_stop (true/false)\n\nif (msg.payload === true) {\n    msg.payload = \"ON\";       // Texto a mostrar\n    msg.color = \"green\";      // Color para ui_text o ui_template\n} else {\n    msg.payload = \"OFF\";\n    msg.color = \"red\";\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 220,
+        "wires": [
+            [
+                "3ab8fe1f78201428"
+            ]
+        ]
+    },
+    {
+        "id": "c435a841c003f1c3",
+        "type": "ui_text",
+        "z": "2c610c4e96acf94f",
+        "group": "513bc2426d63b254",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "Selección",
+        "label": "Si deseas realizar alguna simulación, por favor ve al menú superior izquierdo y selecciona la planta que quieras controlar.",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "Arial,Arial,Helvetica,sans-serif",
+        "fontSize": "16",
+        "color": "#212121",
+        "x": 80,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "44801f760ea6af5b",
+        "type": "debug",
+        "z": "2c610c4e96acf94f",
+        "name": "debug 5",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "10f59aa4cc344ff2",
+        "type": "debug",
+        "z": "2c610c4e96acf94f",
+        "name": "debug 6",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "58f64573bb602633",
+        "type": "delay",
+        "z": "2c610c4e96acf94f",
+        "name": "Limit",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "0.5",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 830,
+        "y": 600,
+        "wires": [
+            [
+                "10e93a09d34fa4fc"
+            ]
+        ]
+    },
+    {
+        "id": "513bc2426d63b254",
+        "type": "ui_group",
+        "name": "TITULO",
+        "tab": "a78af25f21414d8e",
+        "order": 1,
+        "disp": false,
+        "width": 12,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a289498a2dc28964",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "database",
+        "name": "DataBase_InfluxDB",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://10.11.164.102:8086",
+        "timeout": 10,
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "a78af25f21414d8e",
+        "type": "ui_tab",
+        "name": "Regulador",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "10765911fec99d7d",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.5",
+            "node-red-contrib-influxdb": "0.7.0"
+        }
+    }
+]
